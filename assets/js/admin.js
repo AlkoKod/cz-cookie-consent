@@ -11,4 +11,15 @@
 			event.preventDefault();
 		}
 	});
+
+	// Highlight the selected network-mode card.
+	document.addEventListener('change', function (event) {
+		if (!event.target.name || event.target.name !== 'czcc_network_mode') {
+			return;
+		}
+		document.querySelectorAll('.czcc-mode-option').forEach(function (option) {
+			var input = option.querySelector('input[name="czcc_network_mode"]');
+			option.classList.toggle('is-active', !!(input && input.checked));
+		});
+	});
 })();

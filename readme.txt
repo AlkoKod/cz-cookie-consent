@@ -4,7 +4,7 @@ Tags: cookie consent, gdpr, google consent mode, gtm, multisite
 Requires at least: 6.0
 Tested up to: 6.8
 Requires PHP: 7.4
-Stable tag: 1.2.0
+Stable tag: 1.3.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -45,6 +45,12 @@ Yes. The plugin manages Consent Mode and the dataLayer regardless of how GTM is 
 In a custom global table (base_prefix + czcc_consents) with a blog_id column. IP addresses and user agents are stored only as salted SHA-256 hashes.
 
 == Changelog ==
+
+= 1.3.0 =
+* Redesigned admin UI: branded header, card-based settings layout, toggle switches, clearer field grouping.
+* Consent log now shows a stats overview (total, last 30 days, accept/reject/custom/update counts) on both site and network screens.
+* Texts tab: languages are collapsible sections instead of one long page.
+* Network mode selector redesigned as option cards.
 
 = 1.2.0 =
 * The [czcc_preferences] shortcode now supports style="button" (neutral themable button look), a class attribute for theme button classes and a customizable text attribute.

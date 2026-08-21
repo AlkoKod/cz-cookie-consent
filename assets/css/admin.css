@@ -1,28 +1,313 @@
 /**
  * CZ Cookie Consent – admin styles.
+ *
+ * WP-native look: white cards, WP blue accents, no external assets.
  */
 
-.czcc-wrap .czcc-inline {
-	margin-right: 16px;
+.czcc-wrap {
+	max-width: 1200px;
+}
+
+/* ------------------------------------------------------------------ *
+ * Header
+ * ------------------------------------------------------------------ */
+
+.czcc-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	flex-wrap: wrap;
+	gap: 12px;
+	background: #fff;
+	border: 1px solid #c3c4c7;
+	border-radius: 6px;
+	padding: 14px 20px;
+	margin: 16px 0;
+}
+
+.czcc-header-title {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+}
+
+.czcc-header-title h1 {
+	margin: 0;
+	padding: 0;
+	font-size: 20px;
+	line-height: 1.3;
+}
+
+.czcc-subtitle {
+	font-size: 14px;
+	font-weight: 400;
+	color: #646970;
+	margin-left: 6px;
+}
+
+.czcc-logo {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 38px;
+	height: 38px;
+	font-size: 20px;
+	background: #f0f6fc;
+	border: 1px solid #c5d9ed;
+	border-radius: 8px;
+}
+
+.czcc-version {
+	font-size: 11px;
+	font-weight: 600;
+	color: #2271b1;
+	background: #f0f6fc;
+	border: 1px solid #c5d9ed;
+	border-radius: 999px;
+	padding: 2px 10px;
+}
+
+.czcc-header-links {
+	display: flex;
+	gap: 14px;
+	font-size: 13px;
+}
+
+.czcc-header-links a {
+	text-decoration: none;
+}
+
+/* ------------------------------------------------------------------ *
+ * Tabs + body
+ * ------------------------------------------------------------------ */
+
+.czcc-tabs.nav-tab-wrapper {
+	border-bottom-color: #c3c4c7;
+	margin-bottom: 0;
+}
+
+.czcc-body {
+	margin-top: 20px;
+}
+
+.czcc-tab-intro {
+	color: #646970;
+	max-width: 800px;
+}
+
+/* ------------------------------------------------------------------ *
+ * Cards
+ * ------------------------------------------------------------------ */
+
+.czcc-cards {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+	gap: 16px;
+	align-items: start;
+}
+
+.czcc-card {
+	background: #fff;
+	border: 1px solid #c3c4c7;
+	border-radius: 6px;
+	padding: 18px 20px;
+	margin: 0 0 16px;
+}
+
+.czcc-cards .czcc-card {
+	margin: 0;
+}
+
+.czcc-card h2 {
+	margin: 0 0 4px;
+	padding: 0 0 10px;
+	font-size: 15px;
+	border-bottom: 1px solid #f0f0f1;
+}
+
+.czcc-card-desc {
+	color: #646970;
+	margin: 8px 0 14px;
+}
+
+/* ------------------------------------------------------------------ *
+ * Fields
+ * ------------------------------------------------------------------ */
+
+.czcc-field {
+	margin: 14px 0;
+}
+
+.czcc-field > label {
+	display: block;
+	font-weight: 600;
+	margin-bottom: 4px;
+}
+
+.czcc-field .description {
+	margin-top: 4px;
+}
+
+.czcc-field-row {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0 20px;
+}
+
+.czcc-field-row .czcc-field {
+	flex: 1 1 140px;
+}
+
+.czcc-field-inline {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+}
+
+.czcc-field-inline > label {
+	margin: 0;
+}
+
+/* ------------------------------------------------------------------ *
+ * Toggle switches
+ * ------------------------------------------------------------------ */
+
+.czcc-toggle {
+	position: relative;
+	display: flex;
+	align-items: flex-start;
+	gap: 10px;
+	cursor: pointer;
+	line-height: 1.5;
+}
+
+.czcc-toggle input[type="checkbox"] {
+	position: absolute;
+	opacity: 0;
+	width: 0;
+	height: 0;
+	margin: 0;
+}
+
+.czcc-toggle-slider {
+	flex: 0 0 auto;
+	position: relative;
+	width: 36px;
+	height: 20px;
+	margin-top: 1px;
+	background: #8c8f94;
+	border-radius: 999px;
+	transition: background-color 0.15s ease;
+}
+
+.czcc-toggle-slider::after {
+	content: "";
+	position: absolute;
+	top: 2px;
+	left: 2px;
+	width: 16px;
+	height: 16px;
+	background: #fff;
+	border-radius: 50%;
+	transition: transform 0.15s ease;
+	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+}
+
+.czcc-toggle input:checked + .czcc-toggle-slider {
+	background: #2271b1;
+}
+
+.czcc-toggle input:checked + .czcc-toggle-slider::after {
+	transform: translateX(16px);
+}
+
+.czcc-toggle input:focus-visible + .czcc-toggle-slider {
+	outline: 2px solid #2271b1;
+	outline-offset: 2px;
+}
+
+.czcc-toggle input:disabled + .czcc-toggle-slider {
+	opacity: 0.45;
+	cursor: not-allowed;
+}
+
+.czcc-toggle-group {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+	margin: 12px 0 4px;
+}
+
+.czcc-toggle-group-inline {
+	flex-direction: row;
+	flex-wrap: wrap;
+	gap: 10px 28px;
+}
+
+/* ------------------------------------------------------------------ *
+ * Services / iframe tables
+ * ------------------------------------------------------------------ */
+
+.czcc-services-table {
+	border: none;
+	box-shadow: none;
+}
+
+.czcc-services-table thead th {
+	font-size: 11px;
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+	color: #646970;
+}
+
+.czcc-services-table td {
+	vertical-align: middle;
 }
 
 .czcc-services-table code {
 	font-size: 11px;
+	color: #646970;
+	background: transparent;
+	padding: 0;
 }
+
+.czcc-col-toggle {
+	width: 60px;
+}
+
+.czcc-col-cookies {
+	font-size: 12px;
+	color: #646970;
+	max-width: 220px;
+}
+
+.czcc-provider {
+	color: #646970;
+}
+
+/* ------------------------------------------------------------------ *
+ * Badges + consent mode chips
+ * ------------------------------------------------------------------ */
 
 .czcc-badge {
 	display: inline-block;
-	padding: 1px 6px;
-	border-radius: 3px;
+	padding: 1px 8px;
+	border-radius: 999px;
 	background: #e5f5fa;
 	color: #045;
 	font-size: 11px;
 	margin-right: 4px;
+	white-space: nowrap;
 }
 
 .czcc-badge-req {
 	background: #fef3e0;
 	color: #843;
+}
+
+.czcc-badge-ok {
+	background: #d9f2d9;
+	color: #163;
 }
 
 .czcc-gcm {
@@ -43,24 +328,204 @@
 	color: #711;
 }
 
-.czcc-lang-heading {
-	border-bottom: 1px solid #ccd0d4;
-	padding-bottom: 4px;
-	margin-top: 32px;
+/* ------------------------------------------------------------------ *
+ * Stats row (consent log)
+ * ------------------------------------------------------------------ */
+
+.czcc-stats {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+	gap: 12px;
+	margin: 0 0 16px;
+}
+
+.czcc-stat {
+	background: #fff;
+	border: 1px solid #c3c4c7;
+	border-left: 4px solid #c3c4c7;
+	border-radius: 6px;
+	padding: 12px 16px;
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+}
+
+.czcc-stat-neutral {
+	border-left-color: #2271b1;
+}
+
+.czcc-stat-granted {
+	border-left-color: #00a32a;
+}
+
+.czcc-stat-denied {
+	border-left-color: #d63638;
+}
+
+.czcc-stat-value {
+	font-size: 22px;
+	font-weight: 600;
+	line-height: 1.2;
+}
+
+.czcc-stat-label {
+	font-size: 12px;
+	color: #646970;
+}
+
+.czcc-actions {
+	margin: 0 0 12px;
+}
+
+/* ------------------------------------------------------------------ *
+ * Texts tab: per-language sections
+ * ------------------------------------------------------------------ */
+
+details.czcc-lang {
+	background: #fff;
+	border: 1px solid #c3c4c7;
+	border-radius: 6px;
+	margin-bottom: 12px;
+}
+
+details.czcc-lang summary {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	padding: 12px 16px;
+	cursor: pointer;
+	font-weight: 600;
+	list-style: none;
+}
+
+details.czcc-lang summary::-webkit-details-marker {
+	display: none;
+}
+
+details.czcc-lang summary::before {
+	content: "▸";
+	color: #787c82;
+	transition: transform 0.15s ease;
+}
+
+details.czcc-lang[open] summary::before {
+	transform: rotate(90deg);
+}
+
+details.czcc-lang[open] summary {
+	border-bottom: 1px solid #f0f0f1;
+}
+
+.czcc-lang-chip {
+	display: inline-block;
+	min-width: 30px;
+	text-align: center;
+	padding: 1px 8px;
+	border-radius: 4px;
+	background: #2271b1;
+	color: #fff;
+	font-size: 11px;
+	letter-spacing: 0.05em;
+}
+
+.czcc-lang-title {
+	font-weight: 400;
+	color: #646970;
+	flex: 1 1 auto;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.czcc-lang-fields {
+	padding: 6px 16px 14px;
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+	gap: 0 24px;
+}
+
+.czcc-lang-fields .czcc-field input[type="text"],
+.czcc-lang-fields .czcc-field input[type="url"],
+.czcc-lang-fields .czcc-field textarea {
+	width: 100%;
 }
 
 .czcc-remove-lang {
 	font-size: 12px;
-	font-weight: normal;
-	margin-left: 12px;
+	font-weight: 400;
 	color: #a00;
+	margin-left: auto;
 }
+
+/* ------------------------------------------------------------------ *
+ * Network mode selector
+ * ------------------------------------------------------------------ */
+
+.czcc-mode-options {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+	gap: 12px;
+	margin-top: 12px;
+}
+
+.czcc-mode-option {
+	display: block;
+	border: 1px solid #c3c4c7;
+	border-radius: 6px;
+	padding: 12px 14px;
+	cursor: pointer;
+	transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.czcc-mode-option:hover {
+	border-color: #2271b1;
+}
+
+.czcc-mode-option.is-active {
+	border-color: #2271b1;
+	box-shadow: 0 0 0 1px #2271b1;
+}
+
+.czcc-mode-option input {
+	margin-right: 6px;
+}
+
+.czcc-mode-name {
+	font-weight: 600;
+}
+
+.czcc-mode-desc {
+	display: block;
+	margin-top: 4px;
+	font-size: 12px;
+	color: #646970;
+}
+
+/* ------------------------------------------------------------------ *
+ * Status table (tools)
+ * ------------------------------------------------------------------ */
 
 .czcc-status-table {
-	max-width: 800px;
+	max-width: 100%;
+	border: none;
+	box-shadow: none;
 }
 
-.czcc-network-mode label {
-	display: inline-block;
-	margin: 4px 0;
+.czcc-status-table td:first-child {
+	width: 260px;
+	font-weight: 600;
+}
+
+/* ------------------------------------------------------------------ *
+ * Responsive
+ * ------------------------------------------------------------------ */
+
+@media (max-width: 960px) {
+	.czcc-cards {
+		grid-template-columns: 1fr;
+	}
+
+	.czcc-lang-fields {
+		grid-template-columns: 1fr;
+	}
 }

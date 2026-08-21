@@ -293,6 +293,39 @@ class CZCC_Consent_Repository {
 	}
 
 	/**
+	 * Aggregate stats for the admin overview.
+	 *
+	 * @param int|null $blog_id Blog scope; null = all blogs.
+	 * @return array{total:int, by_source:array<string,int>, recent30:int}
+	 */
+	public static function stats( $blog_id = null ) {
+		global $wpdb;
+
+		$table = CZCC_DB::table_name();
+		$where = ( null === $blog_id ) ? '1=1' : $wpdb->prepare( 'blog_id = %d', (int) $blog_id );
+
+		// phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery -- $where is prepared above.
+		$rows = $wpdb->get_results( "SELECT source, COUNT(*) AS cnt FROM {$table} WHERE {$where} GROUP BY source", ARRAY_A );
+
+		$by_source = array();
+		$total     = 0;
+		foreach ( (array) $rows as $row ) {
+			$by_source[ $row['source'] ] = (int) $row['cnt'];
+			$total                      += (int) $row['cnt'];
+		}
+
+		$since    = gmdate( 'Y-m-d H:i:s', time() - 30 * DAY_IN_SECONDS );
+		$recent30 = (int) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM {$table} WHERE {$where} AND created_at >= %s", $since ) );
+		// phpcs:enable
+
+		return array(
+			'total'     => $total,
+			'by_source' => $by_source,
+			'recent30'  => $recent30,
+		);
+	}
+
+	/**
 	 * Total row count for a blog.
 	 *
 	 * @param int|null $blog_id Blog scope; null = all.
