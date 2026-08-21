@@ -72,8 +72,9 @@ class CZCC_Admin {
 		if ( false === strpos( (string) $hook, 'czcc' ) ) {
 			return;
 		}
+		wp_enqueue_style( 'wp-color-picker' );
 		wp_enqueue_style( 'czcc-admin', CZCC_PLUGIN_URL . 'assets/css/admin.css', array(), CZCC_VERSION );
-		wp_enqueue_script( 'czcc-admin', CZCC_PLUGIN_URL . 'assets/js/admin.js', array(), CZCC_VERSION, true );
+		wp_enqueue_script( 'czcc-admin', CZCC_PLUGIN_URL . 'assets/js/admin.js', array( 'jquery', 'wp-color-picker' ), CZCC_VERSION, true );
 	}
 
 	/* ------------------------------------------------------------------ *
@@ -284,6 +285,7 @@ class CZCC_Admin {
 
 		$tabs = array(
 			'general'  => __( 'General', 'cz-cookie-consent' ),
+			'design'   => __( 'Design', 'cz-cookie-consent' ),
 			'services' => __( 'Categories & services', 'cz-cookie-consent' ),
 			'texts'    => __( 'Texts', 'cz-cookie-consent' ),
 			'iframes'  => __( 'Iframe blocking', 'cz-cookie-consent' ),
@@ -294,7 +296,7 @@ class CZCC_Admin {
 
 		// Enforced network configuration: only data/status tabs remain.
 		if ( 'enforce' === $mode ) {
-			unset( $tabs['general'], $tabs['services'], $tabs['texts'], $tabs['iframes'] );
+			unset( $tabs['general'], $tabs['design'], $tabs['services'], $tabs['texts'], $tabs['iframes'] );
 			$default_tab = 'log';
 		}
 
@@ -377,6 +379,8 @@ class CZCC_Admin {
 
 		if ( 'general' === $tab ) {
 			self::render_general_tab( $settings );
+		} elseif ( 'design' === $tab ) {
+			self::render_design_tab( $settings );
 		} elseif ( 'services' === $tab ) {
 			self::render_services_tab( $settings );
 		} elseif ( 'texts' === $tab ) {
@@ -406,6 +410,19 @@ class CZCC_Admin {
 			foreach ( $general_flags as $key ) {
 				if ( ! empty( $settings[ $key ] ) ) {
 					printf( '<input type="hidden" name="czcc[%s]" value="1">', esc_attr( $key ) );
+				}
+			}
+		}
+
+		if ( 'design' !== $tab ) {
+			printf( '<input type="hidden" name="czcc[banner_theme]" value="%s">', esc_attr( isset( $settings['banner_theme'] ) ? $settings['banner_theme'] : 'light' ) );
+			printf( '<input type="hidden" name="czcc[font_mode]" value="%s">', esc_attr( isset( $settings['font_mode'] ) ? $settings['font_mode'] : 'default' ) );
+			printf( '<input type="hidden" name="czcc[font_custom]" value="%s">', esc_attr( isset( $settings['font_custom'] ) ? $settings['font_custom'] : '' ) );
+			if ( isset( $settings['colors'] ) && is_array( $settings['colors'] ) ) {
+				foreach ( $settings['colors'] as $color_key => $color_value ) {
+					if ( '' !== $color_value ) {
+						printf( '<input type="hidden" name="czcc[colors][%1$s]" value="%2$s">', esc_attr( $color_key ), esc_attr( $color_value ) );
+					}
 				}
 			}
 		}
@@ -550,6 +567,77 @@ class CZCC_Admin {
 					echo self::toggle( 'czcc[delete_on_uninstall]', $settings['delete_on_uninstall'], __( 'Delete all plugin data on uninstall', 'cz-cookie-consent' ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 					echo self::toggle( 'czcc[debug]', $settings['debug'], __( 'Debug mode (console logging)', 'cz-cookie-consent' ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 					?>
+				</div>
+			</div>
+
+		</div>
+		<?php
+	}
+
+	/**
+	 * Design tab: theme, colors, font.
+	 *
+	 * @param array $settings Settings.
+	 */
+	private static function render_design_tab( array $settings ) {
+		$theme  = isset( $settings['banner_theme'] ) ? $settings['banner_theme'] : 'light';
+		$colors = isset( $settings['colors'] ) && is_array( $settings['colors'] ) ? $settings['colors'] : array();
+
+		$color_fields = array(
+			'bg'                     => __( 'Background', 'cz-cookie-consent' ),
+			'text'                   => __( 'Text', 'cz-cookie-consent' ),
+			'secondary_text'         => __( 'Secondary text', 'cz-cookie-consent' ),
+			'link'                   => __( 'Links', 'cz-cookie-consent' ),
+			'btn_primary_bg'         => __( 'Primary button background', 'cz-cookie-consent' ),
+			'btn_primary_color'      => __( 'Primary button text', 'cz-cookie-consent' ),
+			'btn_primary_hover_bg'   => __( 'Primary button hover', 'cz-cookie-consent' ),
+			'btn_secondary_bg'       => __( 'Secondary button background', 'cz-cookie-consent' ),
+			'btn_secondary_color'    => __( 'Secondary button text', 'cz-cookie-consent' ),
+			'btn_secondary_hover_bg' => __( 'Secondary button hover', 'cz-cookie-consent' ),
+			'toggle_on_bg'           => __( 'Toggle: on', 'cz-cookie-consent' ),
+			'toggle_off_bg'          => __( 'Toggle: off', 'cz-cookie-consent' ),
+			'overlay'                => __( 'Page overlay', 'cz-cookie-consent' ),
+		);
+		?>
+		<div class="czcc-cards">
+
+			<div class="czcc-card">
+				<h2><?php esc_html_e( 'Theme', 'cz-cookie-consent' ); ?></h2>
+				<div class="czcc-field">
+					<label for="czcc-theme"><?php esc_html_e( 'Banner theme', 'cz-cookie-consent' ); ?></label>
+					<select id="czcc-theme" name="czcc[banner_theme]">
+						<option value="light" <?php selected( $theme, 'light' ); ?>><?php esc_html_e( 'Light (default)', 'cz-cookie-consent' ); ?></option>
+						<option value="dark" <?php selected( $theme, 'dark' ); ?>><?php esc_html_e( 'Dark', 'cz-cookie-consent' ); ?></option>
+						<option value="auto" <?php selected( $theme, 'auto' ); ?>><?php esc_html_e( 'Auto (follows visitor\'s prefers-color-scheme)', 'cz-cookie-consent' ); ?></option>
+					</select>
+					<p class="description"><?php esc_html_e( 'Custom colors below override the chosen theme in both light and dark mode.', 'cz-cookie-consent' ); ?></p>
+				</div>
+				<h2><?php esc_html_e( 'Font', 'cz-cookie-consent' ); ?></h2>
+				<div class="czcc-field">
+					<label for="czcc-font-mode"><?php esc_html_e( 'Banner font', 'cz-cookie-consent' ); ?></label>
+					<select id="czcc-font-mode" name="czcc[font_mode]">
+						<option value="default" <?php selected( $settings['font_mode'], 'default' ); ?>><?php esc_html_e( 'Library default', 'cz-cookie-consent' ); ?></option>
+						<option value="inherit" <?php selected( $settings['font_mode'], 'inherit' ); ?>><?php esc_html_e( 'Inherit from website (recommended)', 'cz-cookie-consent' ); ?></option>
+						<option value="custom" <?php selected( $settings['font_mode'], 'custom' ); ?>><?php esc_html_e( 'Custom font stack', 'cz-cookie-consent' ); ?></option>
+					</select>
+				</div>
+				<div class="czcc-field">
+					<label for="czcc-font-custom"><?php esc_html_e( 'Custom font stack', 'cz-cookie-consent' ); ?></label>
+					<input type="text" id="czcc-font-custom" class="regular-text" name="czcc[font_custom]" value="<?php echo esc_attr( $settings['font_custom'] ); ?>" placeholder="'Inter', 'Segoe UI', sans-serif">
+					<p class="description"><?php esc_html_e( 'Used only with the "Custom font stack" option. The font itself must already be loaded by your theme.', 'cz-cookie-consent' ); ?></p>
+				</div>
+			</div>
+
+			<div class="czcc-card">
+				<h2><?php esc_html_e( 'Colors', 'cz-cookie-consent' ); ?></h2>
+				<p class="czcc-card-desc"><?php esc_html_e( 'Leave a color empty to keep the theme default. Use "Clear" in the picker to reset a color.', 'cz-cookie-consent' ); ?></p>
+				<div class="czcc-color-grid">
+					<?php foreach ( $color_fields as $key => $label ) : ?>
+						<div class="czcc-field">
+							<label><?php echo esc_html( $label ); ?></label>
+							<input type="text" class="czcc-color-field" name="czcc[colors][<?php echo esc_attr( $key ); ?>]" value="<?php echo esc_attr( isset( $colors[ $key ] ) ? $colors[ $key ] : '' ); ?>">
+						</div>
+					<?php endforeach; ?>
 				</div>
 			</div>
 
@@ -861,6 +949,7 @@ class CZCC_Admin {
 
 		$tabs = array(
 			'general'  => __( 'General', 'cz-cookie-consent' ),
+			'design'   => __( 'Design', 'cz-cookie-consent' ),
 			'services' => __( 'Categories & services', 'cz-cookie-consent' ),
 			'texts'    => __( 'Texts', 'cz-cookie-consent' ),
 			'iframes'  => __( 'Iframe blocking', 'cz-cookie-consent' ),
@@ -947,6 +1036,8 @@ class CZCC_Admin {
 
 		if ( 'general' === $tab ) {
 			self::render_general_tab( $settings );
+		} elseif ( 'design' === $tab ) {
+			self::render_design_tab( $settings );
 		} elseif ( 'services' === $tab ) {
 			self::render_services_tab( $settings );
 		} elseif ( 'texts' === $tab ) {

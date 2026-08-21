@@ -124,6 +124,16 @@ Detailní návod na GTM triggery/proměnné: **[docs/gtm-setup.md](docs/gtm-setu
 - Náhledy videí se ve výchozím stavu **nenačítají** (únik IP na servery třetí strany před souhlasem); lze zapnout.
 - Odblokování po souhlasu proběhne **bez reloadu** (service `onAccept` → `im.acceptService()`).
 
+## Design (barvy, téma, font)
+
+Tab **Design** v nastavení:
+
+- **Téma banneru** – světlé / tmavé / auto (podle `prefers-color-scheme` návštěvníka, s live přepínáním).
+- **Barvy** – 13 kurátorovaných barev (pozadí, texty, odkazy, primární/sekundární tlačítka včetně hoveru, přepínače, overlay) přes standardní WP color picker. Prázdná hodnota = výchozí barva tématu; vlastní barvy se aplikují jako přepis CSS proměnných `--cc-*` a platí v light i dark módu.
+- **Font** – výchozí z knihovny / **převzít z webu** (doporučeno, `--cc-font-family: inherit`) / vlastní font stack.
+
+Pokročilejší úpravy (radiusy, stíny…) lze dál dělat vlastním CSS přes `--cc-*` proměnné knihovny na selektoru `#cc-main`.
+
 ## Shortcode – úprava souhlasu
 
 Návštěvník musí mít možnost souhlas kdykoli změnit (typicky odkaz v patičce):

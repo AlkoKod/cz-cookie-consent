@@ -39,6 +39,10 @@ class CZCC_Settings {
 			'banner_layout'            => 'box inline',
 			'banner_position'          => 'bottom left',
 			'preferences_layout'       => 'box',
+			'banner_theme'             => 'light',
+			'font_mode'                => 'default',
+			'font_custom'              => '',
+			'colors'                   => array_fill_keys( self::color_keys(), '' ),
 			'show_reject_button'       => true,
 			'equal_weight_buttons'     => true,
 			'flip_buttons'             => false,
@@ -80,6 +84,30 @@ class CZCC_Settings {
 			'auto_purge_days'          => 0,
 			'debug'                    => false,
 			'delete_on_uninstall'      => false,
+		);
+	}
+
+	/**
+	 * Curated banner color keys (mapped to --cc-* variables in
+	 * CZCC_Frontend::custom_css()). Empty value = library default.
+	 *
+	 * @return string[]
+	 */
+	public static function color_keys() {
+		return array(
+			'bg',
+			'text',
+			'secondary_text',
+			'link',
+			'btn_primary_bg',
+			'btn_primary_color',
+			'btn_primary_hover_bg',
+			'btn_secondary_bg',
+			'btn_secondary_color',
+			'btn_secondary_hover_bg',
+			'toggle_on_bg',
+			'toggle_off_bg',
+			'overlay',
 		);
 	}
 
@@ -286,6 +314,29 @@ class CZCC_Settings {
 		$clean['banner_position'] = ( isset( $input['banner_position'] ) && in_array( $input['banner_position'], $positions, true ) ) ? $input['banner_position'] : $defaults['banner_position'];
 		$clean['preferences_layout'] = ( isset( $input['preferences_layout'] ) && in_array( $input['preferences_layout'], $pref_layouts, true ) ) ? $input['preferences_layout'] : $defaults['preferences_layout'];
 
+		// Design: theme, font, colors.
+		if ( isset( $input['banner_theme'] ) ) {
+			$clean['banner_theme'] = in_array( $input['banner_theme'], array( 'light', 'dark', 'auto' ), true ) ? $input['banner_theme'] : 'light';
+		}
+		if ( isset( $input['font_mode'] ) ) {
+			$clean['font_mode'] = in_array( $input['font_mode'], array( 'default', 'inherit', 'custom' ), true ) ? $input['font_mode'] : 'default';
+		}
+		if ( isset( $input['font_custom'] ) ) {
+			// Allow a plain CSS font stack: letters, digits, spaces, commas,
+			// hyphens and quotes. Everything else is stripped.
+			$clean['font_custom'] = trim( preg_replace( '/[^a-zA-Z0-9,\s\'"\-]/', '', (string) $input['font_custom'] ) );
+		}
+		if ( isset( $input['colors'] ) && is_array( $input['colors'] ) ) {
+			$clean['colors'] = isset( $current['colors'] ) && is_array( $current['colors'] ) ? $current['colors'] : array();
+			foreach ( self::color_keys() as $color_key ) {
+				if ( ! array_key_exists( $color_key, $input['colors'] ) ) {
+					continue;
+				}
+				$value = trim( (string) $input['colors'][ $color_key ] );
+				$clean['colors'][ $color_key ] = self::sanitize_hex( $value );
+			}
+		}
+
 		foreach ( array( 'show_reject_button', 'equal_weight_buttons', 'flip_buttons', 'disable_page_interaction', 'hide_from_bots', 'url_passthrough', 'ads_data_redaction', 'auto_wrap_iframes', 'load_thumbnails', 'gtm4wp_suppress_default', 'debug', 'delete_on_uninstall' ) as $flag ) {
 			$clean[ $flag ] = ! empty( $input[ $flag ] );
 		}
@@ -393,6 +444,23 @@ class CZCC_Settings {
 		}
 
 		return $clean;
+	}
+
+	/**
+	 * Validates a hex color; returns '' when invalid/empty.
+	 *
+	 * @param string $value Raw value.
+	 * @return string
+	 */
+	private static function sanitize_hex( $value ) {
+		if ( '' === $value ) {
+			return '';
+		}
+		if ( function_exists( 'sanitize_hex_color' ) ) {
+			$hex = sanitize_hex_color( $value );
+			return null === $hex ? '' : $hex;
+		}
+		return preg_match( '/^#(?:[0-9a-fA-F]{3}){1,2}$/', $value ) ? $value : '';
 	}
 
 	/**

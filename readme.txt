@@ -4,7 +4,7 @@ Tags: cookie consent, gdpr, google consent mode, gtm, multisite
 Requires at least: 6.0
 Tested up to: 6.8
 Requires PHP: 7.4
-Stable tag: 1.3.1
+Stable tag: 1.4.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -45,6 +45,10 @@ Yes. The plugin manages Consent Mode and the dataLayer regardless of how GTM is 
 In a custom global table (base_prefix + czcc_consents) with a blog_id column. IP addresses and user agents are stored only as salted SHA-256 hashes.
 
 == Changelog ==
+
+= 1.4.0 =
+* New Design tab: banner theme (light / dark / auto via prefers-color-scheme), 13 curated banner colors with WordPress color pickers (background, text, links, buttons incl. hover, toggles, overlay) and banner font (library default / inherit from website / custom font stack).
+* Custom colors are output as CSS variable overrides and win in both light and dark mode; empty values keep the theme defaults.
 
 = 1.3.1 =
 * Fix: Google Maps iframes using the old-style embed URL (maps.google.com/maps?...&output=embed, e.g. the Bricks builder Map element without API key) were not blocked before consent. All three Google Maps embed URL formats are now matched.

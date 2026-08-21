@@ -339,9 +339,30 @@
 	}
 
 	/* ------------------------------------------------------------------ *
+	 * Theme (light / dark / auto via prefers-color-scheme)
+	 * ------------------------------------------------------------------ */
+
+	function applyTheme() {
+		var root = document.documentElement;
+		if (cfg.theme === 'dark') {
+			root.classList.add('cc--darkmode');
+		} else if (cfg.theme === 'auto' && window.matchMedia) {
+			var query = window.matchMedia('(prefers-color-scheme: dark)');
+			var sync = function () {
+				root.classList.toggle('cc--darkmode', query.matches);
+			};
+			sync();
+			if (query.addEventListener) {
+				query.addEventListener('change', sync);
+			}
+		}
+	}
+
+	/* ------------------------------------------------------------------ *
 	 * Run
 	 * ------------------------------------------------------------------ */
 
+	applyTheme();
 	setupIframeManager();
 
 	CC.run({

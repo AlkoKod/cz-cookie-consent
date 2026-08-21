@@ -210,6 +210,11 @@ JS;
 		wp_enqueue_style( 'czcc-cookieconsent', CZCC_PLUGIN_URL . 'assets/vendor/cookieconsent/cookieconsent.css', array(), CZCC_COOKIECONSENT_VERSION );
 		wp_enqueue_style( 'czcc-frontend', CZCC_PLUGIN_URL . 'assets/css/frontend.css', array( 'czcc-cookieconsent' ), CZCC_VERSION );
 
+		$custom_css = self::custom_css();
+		if ( '' !== $custom_css ) {
+			wp_add_inline_style( 'czcc-cookieconsent', $custom_css );
+		}
+
 		wp_enqueue_script( 'czcc-cookieconsent', CZCC_PLUGIN_URL . 'assets/vendor/cookieconsent/cookieconsent.umd.js', array(), CZCC_COOKIECONSENT_VERSION, true );
 
 		$deps = array( 'czcc-cookieconsent' );
@@ -223,6 +228,58 @@ JS;
 		wp_enqueue_script( 'czcc-frontend', CZCC_PLUGIN_URL . 'assets/js/frontend.js', $deps, CZCC_VERSION . ( $debug ? '.' . time() : '' ), true );
 
 		wp_add_inline_script( 'czcc-frontend', 'var CZCC_CFG = ' . wp_json_encode( self::frontend_config() ) . ';', 'before' );
+	}
+
+	/**
+	 * Inline CSS overriding the banner's --cc-* variables from settings.
+	 *
+	 * Scoped to both light and dark selectors so custom values always win
+	 * over the built-in .cc--darkmode theme.
+	 *
+	 * @return string
+	 */
+	public static function custom_css() {
+		$settings = CZCC_Settings::get();
+		$colors   = isset( $settings['colors'] ) && is_array( $settings['colors'] ) ? $settings['colors'] : array();
+
+		$map = array(
+			'bg'                     => array( '--cc-bg' ),
+			'text'                   => array( '--cc-primary-color' ),
+			'secondary_text'         => array( '--cc-secondary-color' ),
+			'link'                   => array( '--cc-link-color' ),
+			'btn_primary_bg'         => array( '--cc-btn-primary-bg', '--cc-btn-primary-border-color' ),
+			'btn_primary_color'      => array( '--cc-btn-primary-color' ),
+			'btn_primary_hover_bg'   => array( '--cc-btn-primary-hover-bg', '--cc-btn-primary-hover-border-color' ),
+			'btn_secondary_bg'       => array( '--cc-btn-secondary-bg', '--cc-btn-secondary-border-color' ),
+			'btn_secondary_color'    => array( '--cc-btn-secondary-color' ),
+			'btn_secondary_hover_bg' => array( '--cc-btn-secondary-hover-bg', '--cc-btn-secondary-hover-border-color' ),
+			'toggle_on_bg'           => array( '--cc-toggle-on-bg' ),
+			'toggle_off_bg'          => array( '--cc-toggle-off-bg' ),
+			'overlay'                => array( '--cc-overlay-bg' ),
+		);
+
+		$rules = array();
+		foreach ( $map as $key => $variables ) {
+			if ( empty( $colors[ $key ] ) ) {
+				continue;
+			}
+			foreach ( $variables as $variable ) {
+				$rules[] = $variable . ':' . $colors[ $key ];
+			}
+		}
+
+		$font_mode = isset( $settings['font_mode'] ) ? $settings['font_mode'] : 'default';
+		if ( 'inherit' === $font_mode ) {
+			$rules[] = '--cc-font-family:inherit';
+		} elseif ( 'custom' === $font_mode && '' !== trim( (string) $settings['font_custom'] ) ) {
+			$rules[] = '--cc-font-family:' . trim( (string) $settings['font_custom'] );
+		}
+
+		if ( ! $rules ) {
+			return '';
+		}
+
+		return '#cc-main,.cc--darkmode #cc-main{' . implode( ';', $rules ) . '}';
 	}
 
 	/**
@@ -252,6 +309,7 @@ JS;
 				'equalWeight' => ! empty( $settings['equal_weight_buttons'] ),
 				'flip'        => ! empty( $settings['flip_buttons'] ),
 			),
+			'theme'         => isset( $settings['banner_theme'] ) ? $settings['banner_theme'] : 'light',
 			'showReject'    => ! empty( $settings['show_reject_button'] ),
 			'pageBlock'     => ! empty( $settings['disable_page_interaction'] ),
 			'hideFromBots'  => ! empty( $settings['hide_from_bots'] ),

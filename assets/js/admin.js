@@ -12,6 +12,13 @@
 		}
 	});
 
+	// WP color pickers on the Design tab.
+	if (window.jQuery && jQuery.fn.wpColorPicker) {
+		jQuery(function () {
+			jQuery('.czcc-color-field').wpColorPicker();
+		});
+	}
+
 	// Highlight the selected network-mode card.
 	document.addEventListener('change', function (event) {
 		if (!event.target.name || event.target.name !== 'czcc_network_mode') {
