@@ -4,7 +4,7 @@ Tags: cookie consent, gdpr, google consent mode, gtm, multisite
 Requires at least: 6.0
 Tested up to: 6.8
 Requires PHP: 7.4
-Stable tag: 1.3.0
+Stable tag: 1.3.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -45,6 +45,11 @@ Yes. The plugin manages Consent Mode and the dataLayer regardless of how GTM is 
 In a custom global table (base_prefix + czcc_consents) with a blog_id column. IP addresses and user agents are stored only as salted SHA-256 hashes.
 
 == Changelog ==
+
+= 1.3.1 =
+* Fix: Google Maps iframes using the old-style embed URL (maps.google.com/maps?...&output=embed, e.g. the Bricks builder Map element without API key) were not blocked before consent. All three Google Maps embed URL formats are now matched.
+* Fix: content rendered by the Bricks builder bypasses the_content, so iframes were never wrapped there; the plugin now also filters bricks/frontend/render_element.
+* The google-maps embed template is now https://www.google.com/maps{data-id}; legacy manual markup with a bare pb value in data-id keeps working (normalized in JS).
 
 = 1.3.0 =
 * Redesigned admin UI: branded header, card-based settings layout, toggle switches, clearer field grouping.

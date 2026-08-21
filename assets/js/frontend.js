@@ -164,6 +164,17 @@
 			return;
 		}
 
+		// google-maps data-id is the path+query after "/maps". Normalize
+		// legacy manual markup that carries a bare pb-value (v1.3.0 docs).
+		if (iframeServices['google-maps']) {
+			document.querySelectorAll('div[data-service="google-maps"]').forEach(function (div) {
+				var id = div.getAttribute('data-id') || '';
+				if (id && id.charAt(0) !== '/' && id.charAt(0) !== '?') {
+					div.setAttribute('data-id', '/embed?pb=' + id);
+				}
+			});
+		}
+
 		im = window.iframemanager();
 		var services = {};
 		var imTexts = cfg.iframe.texts || {};

@@ -43,6 +43,9 @@ class CZCC_Frontend {
 			add_filter( 'the_content', array( __CLASS__, 'wrap_iframes' ), 99 );
 			add_filter( 'widget_text_content', array( __CLASS__, 'wrap_iframes' ), 99 );
 			add_filter( 'widget_block_content', array( __CLASS__, 'wrap_iframes' ), 99 );
+			// Bricks builder renders outside the_content: filter every
+			// element's HTML (priority 20 = after Bricks' own callbacks).
+			add_filter( 'bricks/frontend/render_element', array( __CLASS__, 'wrap_iframes' ), 20 );
 		}
 
 		add_shortcode( 'czcc_preferences', array( __CLASS__, 'preferences_shortcode' ) );
@@ -351,9 +354,17 @@ JS;
 	/**
 	 * Iframe service definitions for iframemanager.
 	 *
+	 * Cached per request: wrap_iframes() calls this for every rendered
+	 * Bricks element.
+	 *
 	 * @return array<string, array>
 	 */
 	public static function iframe_services_config() {
+		static $cache = null;
+		if ( null !== $cache ) {
+			return $cache;
+		}
+
 		$settings = CZCC_Settings::get();
 		$rules    = (array) $settings['iframe_rules'];
 		$enabled  = array_merge( array( 'necessary' ), (array) $settings['enabled_categories'] );
@@ -365,7 +376,10 @@ JS;
 				'allow'     => 'accelerometer; encrypted-media; gyroscope; picture-in-picture; fullscreen;',
 			),
 			'google-maps'     => array(
-				'embedUrl'  => 'https://www.google.com/maps/embed?pb={data-id}',
+				// {data-id} is the path+query after "/maps" (e.g.
+				// "/embed?pb=..." or "?q=...&output=embed"); legacy bare
+				// pb-values in manual markup are normalized in frontend.js.
+				'embedUrl'  => 'https://www.google.com/maps{data-id}',
 				'thumbnail' => null,
 				'allow'     => 'picture-in-picture; fullscreen;',
 			),
@@ -418,7 +432,9 @@ JS;
 		 *
 		 * @param array $services Iframe services keyed by slug.
 		 */
-		return (array) apply_filters( 'czcc_iframe_services', $services );
+		$cache = (array) apply_filters( 'czcc_iframe_services', $services );
+
+		return $cache;
 	}
 
 	/**
@@ -465,9 +481,19 @@ JS;
 			return self::placeholder_div( 'youtube', $m[1] );
 		}
 
-		// Google Maps (embed without API key: /maps/embed?pb=...).
-		if ( isset( $services['google-maps'] ) && preg_match( '#^https?://(?:www\.)?google\.[a-z.]{2,6}/maps/embed\?pb=([^&"\']+)#i', $src, $m ) ) {
-			return self::placeholder_div( 'google-maps', $m[1] );
+		// Google Maps. The data-id carries everything after "/maps", so one
+		// embed template (https://www.google.com/maps{data-id}) covers:
+		//  - new style:      google.com/maps/embed?pb=!1m18!...
+		//  - Embed API:      google.com/maps/embed/v1/place?key=...&q=...
+		//  - old style:      maps.google.com/maps?q=...&output=embed
+		//    (used e.g. by the Bricks builder Map element without API key)
+		if ( isset( $services['google-maps'] ) && preg_match( '#^https?://(?:www\.|maps\.)?google\.[a-z.]{2,6}/maps(/embed[^\s"\']*|\?[^\s"\']*)$#i', $src, $m ) ) {
+			$data_id = $m[1];
+			// A bare /maps?query URL is an embed only with output=embed.
+			if ( 0 === strpos( $data_id, '?' ) && false === stripos( $data_id, 'output=embed' ) ) {
+				return $iframe;
+			}
+			return self::placeholder_div( 'google-maps', $data_id );
 		}
 
 		// Instagram.

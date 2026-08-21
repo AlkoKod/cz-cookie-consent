@@ -116,6 +116,8 @@ Detailní návod na GTM triggery/proměnné: **[docs/gtm-setup.md](docs/gtm-setu
 ## Blokování iframe
 
 - Auto-obalení známých iframe v obsahu (YouTube, Google Maps embed, Facebook plugins, Instagram) na `<div data-service="…" data-id="…">` – lze vypnout.
+- Funguje i pro **Bricks builder** (obsah Bricks nejde přes `the_content`; plugin filtruje HTML každého elementu přes `bricks/frontend/render_element`).
+- Google Maps pokrývá všechny tři formáty embed URL: `google.com/maps/embed?pb=…`, Embed API `…/maps/embed/v1/…?key=…` i starý styl `maps.google.com/maps?…&output=embed` (používá např. Bricks element Map bez API klíče).
 - Ruční markup: `<div data-service="youtube" data-id="VIDEO_ID" data-autoscale></div>`.
 - Každé službě lze v adminu nastavit **kategorii, která ji odblokuje** (YouTube → marketing *nebo* functional atd.).
 - Placeholder s textem a tlačítky „Povolit obsah" / „Povolit vždy"; „Povolit vždy" propíše souhlas zpět do CookieConsent (a tedy do GCM + server logu).

@@ -46,6 +46,9 @@ Manuální checklist pro ověření pluginu. Testujte v anonymním okně; stav c
 | D5 | Odvolat souhlas | Iframy se opět zablokují (bez reloadu) |
 | D6 | Google Maps embed | Blokován dle kategorie z nastavení (výchozí functional) |
 | D7 | Přepnout YouTube pravidlo na functional | YouTube se odblokuje souhlasem s functional místo marketing |
+| D8 | Bricks element Map bez API klíče (starý styl `maps.google.com/maps?…&output=embed`) | Iframe je nahrazen placeholderem (filtr `bricks/frontend/render_element`); po souhlasu s functional se mapa načte na stejné adrese |
+| D9 | Ruční markup s holou pb hodnotou v `data-id` (v1.3.0 formát) | Frontend JS ho znormalizuje na `/embed?pb=…`, mapa funguje beze změny markupu |
+| D10 | Běžný odkaz `google.com/maps?q=…` bez `output=embed` v iframe | NEobaluje se (není to embed) |
 
 ## E. GTM4WP
 
