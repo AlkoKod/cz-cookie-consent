@@ -59,3 +59,8 @@
 .czcc-status-table {
 	max-width: 800px;
 }
+
+.czcc-network-mode label {
+	display: inline-block;
+	margin: 4px 0;
+}

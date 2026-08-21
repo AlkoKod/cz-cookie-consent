@@ -4,7 +4,7 @@ Tags: cookie consent, gdpr, google consent mode, gtm, multisite
 Requires at least: 6.0
 Tested up to: 6.8
 Requires PHP: 7.4
-Stable tag: 1.0.0
+Stable tag: 1.1.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -44,6 +44,11 @@ Yes. The plugin manages Consent Mode and the dataLayer regardless of how GTM is 
 In a custom global table (base_prefix + czcc_consents) with a blog_id column. IP addresses and user agents are stored only as salted SHA-256 hashes.
 
 == Changelog ==
+
+= 1.1.0 =
+* Network-wide configuration on multisite: new Network Admin -> Settings -> Cookie Consent page.
+* Two network modes: "Network defaults" (sites inherit until they save their own configuration, with one-click reset back) and "Enforce" (network settings apply everywhere, per-site settings are locked).
+* Tools tab now shows the network mode and whether the site inherits or overrides.
 
 = 1.0.0 =
 * Initial release.

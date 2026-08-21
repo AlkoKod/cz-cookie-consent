@@ -137,6 +137,18 @@ U přihlášených uživatelů se posílá standardní REST nonce a záznam se p
 
 Na multisite navíc **Network admin → Settings → Cookie Consent Log** (log + CSV napříč weby).
 
+### Síťové nastavení (multisite)
+
+**Network admin → Settings → Cookie Consent** umožňuje spravovat konfiguraci celé sítě z jednoho místa. Tři režimy:
+
+| Režim | Chování |
+|---|---|
+| **Off** (výchozí) | Každý web se nastavuje samostatně (chování 1.0.x). |
+| **Network defaults** | Weby dědí síťovou konfiguraci, dokud si neuloží vlastní. Uložení per-site formuláře vytvoří kompletní přepis; tlačítko *Reset to network defaults* jej smaže a web opět dědí. Stav (dědí / přepisuje) je vidět v notice na stránce nastavení i v tabu Tools. |
+| **Enforce** | Všude platí síťová konfigurace; per-site nastavení je zamčené (webu zůstává jen Consent log a Tools) a ukládání je blokované i na úrovni handleru. |
+
+Síťová stránka má stejné taby (General / Categories & services / Texts / Iframe blocking) jako per-site nastavení. Log souhlasů zůstává vždy per-site + síťový přehled.
+
 ## Instalace
 
 1. Nahrajte složku do `wp-content/plugins/` (nebo nainstalujte ZIP).

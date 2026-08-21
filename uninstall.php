@@ -49,12 +49,16 @@ if ( is_multisite() ) {
 		}
 		restore_current_blog();
 	}
-	// Drop the global table only when every site opted in.
+	// Drop the global table + network options only when every site opted in.
 	if ( $czcc_all_opted_in ) {
 		CZCC_DB::drop();
+		delete_site_option( 'czcc_network_settings' );
+		delete_site_option( 'czcc_network_mode' );
 	}
 } else {
 	if ( czcc_uninstall_site() ) {
 		CZCC_DB::drop();
+		delete_site_option( 'czcc_network_settings' );
+		delete_site_option( 'czcc_network_mode' );
 	}
 }

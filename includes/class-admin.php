@@ -21,6 +21,8 @@ class CZCC_Admin {
 		add_action( 'admin_enqueue_scripts', array( __CLASS__, 'enqueue_assets' ) );
 
 		add_action( 'admin_post_czcc_save_settings', array( __CLASS__, 'handle_save_settings' ) );
+		add_action( 'admin_post_czcc_save_network_settings', array( __CLASS__, 'handle_save_network_settings' ) );
+		add_action( 'admin_post_czcc_reset_site_settings', array( __CLASS__, 'handle_reset_site_settings' ) );
 		add_action( 'admin_post_czcc_export_csv', array( __CLASS__, 'handle_export_csv' ) );
 		add_action( 'admin_post_czcc_purge_expired', array( __CLASS__, 'handle_purge_expired' ) );
 		add_action( 'admin_post_czcc_delete_all', array( __CLASS__, 'handle_delete_all' ) );
@@ -40,9 +42,17 @@ class CZCC_Admin {
 	}
 
 	/**
-	 * Network admin menu (network-wide consent log).
+	 * Network admin menu (network settings + network-wide consent log).
 	 */
 	public static function register_network_menu() {
+		add_submenu_page(
+			'settings.php',
+			__( 'Cookie Consent', 'cz-cookie-consent' ),
+			__( 'Cookie Consent', 'cz-cookie-consent' ),
+			'manage_network_options',
+			'czcc-network-settings',
+			array( __CLASS__, 'render_network_settings_page' )
+		);
 		add_submenu_page(
 			'settings.php',
 			__( 'Cookie Consent Log', 'cz-cookie-consent' ),
@@ -73,6 +83,9 @@ class CZCC_Admin {
 		if ( ! current_user_can( 'manage_options' ) ) {
 			wp_die( esc_html__( 'Insufficient permissions.', 'cz-cookie-consent' ) );
 		}
+		if ( 'enforce' === CZCC_Settings::network_mode() ) {
+			wp_die( esc_html__( 'Cookie consent settings are enforced network-wide and cannot be changed per site.', 'cz-cookie-consent' ) );
+		}
 		check_admin_referer( 'czcc_save_settings' );
 
 		$input = isset( $_POST['czcc'] ) && is_array( $_POST['czcc'] ) ? wp_unslash( $_POST['czcc'] ) : array(); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput -- sanitized field-by-field in CZCC_Settings::sanitize().
@@ -81,6 +94,46 @@ class CZCC_Admin {
 
 		$tab = isset( $_POST['czcc_tab'] ) ? sanitize_key( wp_unslash( $_POST['czcc_tab'] ) ) : 'general';
 		wp_safe_redirect( add_query_arg( array( 'page' => 'czcc-settings', 'tab' => $tab, 'updated' => '1' ), admin_url( 'options-general.php' ) ) );
+		exit;
+	}
+
+	/**
+	 * Saves network settings + mode (admin-post).
+	 */
+	public static function handle_save_network_settings() {
+		if ( ! current_user_can( 'manage_network_options' ) ) {
+			wp_die( esc_html__( 'Insufficient permissions.', 'cz-cookie-consent' ) );
+		}
+		check_admin_referer( 'czcc_save_network_settings' );
+
+		$input = isset( $_POST['czcc'] ) && is_array( $_POST['czcc'] ) ? wp_unslash( $_POST['czcc'] ) : array(); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput -- sanitized field-by-field in CZCC_Settings::sanitize().
+
+		CZCC_Settings::update_network( CZCC_Settings::sanitize( $input, CZCC_Settings::network_settings() ) );
+
+		$mode = isset( $_POST['czcc_network_mode'] ) ? sanitize_key( wp_unslash( $_POST['czcc_network_mode'] ) ) : 'off';
+		if ( ! in_array( $mode, array( 'off', 'defaults', 'enforce' ), true ) ) {
+			$mode = 'off';
+		}
+		CZCC_Settings::update_network_mode( $mode );
+
+		$tab = isset( $_POST['czcc_tab'] ) ? sanitize_key( wp_unslash( $_POST['czcc_tab'] ) ) : 'general';
+		wp_safe_redirect( add_query_arg( array( 'page' => 'czcc-network-settings', 'tab' => $tab, 'updated' => '1' ), network_admin_url( 'settings.php' ) ) );
+		exit;
+	}
+
+	/**
+	 * Deletes the per-site override so the site inherits network defaults
+	 * again (admin-post).
+	 */
+	public static function handle_reset_site_settings() {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_die( esc_html__( 'Insufficient permissions.', 'cz-cookie-consent' ) );
+		}
+		check_admin_referer( 'czcc_reset_site_settings' );
+
+		CZCC_Settings::delete_site_settings();
+
+		wp_safe_redirect( add_query_arg( array( 'page' => 'czcc-settings', 'tab' => 'general', 'czcc_reset' => '1' ), admin_url( 'options-general.php' ) ) );
 		exit;
 	}
 
@@ -141,6 +194,8 @@ class CZCC_Admin {
 			return;
 		}
 
+		$mode = CZCC_Settings::network_mode();
+
 		$tabs = array(
 			'general'  => __( 'General', 'cz-cookie-consent' ),
 			'services' => __( 'Categories & services', 'cz-cookie-consent' ),
@@ -149,16 +204,30 @@ class CZCC_Admin {
 			'log'      => __( 'Consent log', 'cz-cookie-consent' ),
 			'tools'    => __( 'Tools & debug', 'cz-cookie-consent' ),
 		);
+		$default_tab = 'general';
 
-		$tab = isset( $_GET['tab'] ) ? sanitize_key( wp_unslash( $_GET['tab'] ) ) : 'general'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		// Enforced network configuration: only data/status tabs remain.
+		if ( 'enforce' === $mode ) {
+			unset( $tabs['general'], $tabs['services'], $tabs['texts'], $tabs['iframes'] );
+			$default_tab = 'log';
+		}
+
+		$tab = isset( $_GET['tab'] ) ? sanitize_key( wp_unslash( $_GET['tab'] ) ) : $default_tab; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		if ( ! isset( $tabs[ $tab ] ) ) {
-			$tab = 'general';
+			$tab = $default_tab;
 		}
 
 		echo '<div class="wrap czcc-wrap"><h1>' . esc_html__( 'CZ Cookie Consent', 'cz-cookie-consent' ) . '</h1>';
 
 		if ( ! empty( $_GET['updated'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			echo '<div class="notice notice-success is-dismissible"><p>' . esc_html__( 'Settings saved.', 'cz-cookie-consent' ) . '</p></div>';
+		}
+		if ( ! empty( $_GET['czcc_reset'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			echo '<div class="notice notice-success is-dismissible"><p>' . esc_html__( 'Site configuration removed. This site now inherits the network defaults.', 'cz-cookie-consent' ) . '</p></div>';
+		}
+
+		if ( 'enforce' === $mode ) {
+			echo '<div class="notice notice-info"><p>' . esc_html__( 'Cookie consent settings are enforced network-wide by the network administrator. Only the consent log and tools are available here.', 'cz-cookie-consent' ) . '</p></div>';
 		}
 		if ( isset( $_GET['purged'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			/* translators: %d: number of deleted records. */
@@ -194,6 +263,18 @@ class CZCC_Admin {
 	 */
 	private static function render_settings_form( $tab ) {
 		$settings = CZCC_Settings::get();
+
+		if ( 'defaults' === CZCC_Settings::network_mode() ) {
+			if ( CZCC_Settings::site_has_override() ) {
+				$reset_url = wp_nonce_url( admin_url( 'admin-post.php?action=czcc_reset_site_settings' ), 'czcc_reset_site_settings' );
+				echo '<div class="notice notice-info inline"><p>';
+				esc_html_e( 'This site uses its own configuration and ignores the network defaults.', 'cz-cookie-consent' );
+				echo ' <a href="' . esc_url( $reset_url ) . '" class="czcc-confirm" data-confirm="' . esc_attr__( 'Discard this site\'s configuration and inherit the network defaults?', 'cz-cookie-consent' ) . '">' . esc_html__( 'Reset to network defaults', 'cz-cookie-consent' ) . '</a>';
+				echo '</p></div>';
+			} else {
+				echo '<div class="notice notice-info inline"><p>' . esc_html__( 'This site inherits the network defaults. Saving this form creates a site-specific configuration that overrides them.', 'cz-cookie-consent' ) . '</p></div>';
+			}
+		}
 
 		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '">';
 		echo '<input type="hidden" name="action" value="czcc_save_settings">';
@@ -571,6 +652,17 @@ class CZCC_Admin {
 				<tr><td><?php esc_html_e( 'DB schema version', 'cz-cookie-consent' ); ?></td><td><?php echo esc_html( (string) get_site_option( CZCC_DB::OPTION_DB_VERSION ) ); ?></td></tr>
 				<tr><td><?php esc_html_e( 'Consent table', 'cz-cookie-consent' ); ?></td><td><code><?php echo esc_html( CZCC_DB::table_name() ); ?></code></td></tr>
 				<tr><td><?php esc_html_e( 'Records (this site)', 'cz-cookie-consent' ); ?></td><td><?php echo esc_html( (string) CZCC_Consent_Repository::count( get_current_blog_id() ) ); ?></td></tr>
+				<?php if ( is_multisite() ) : ?>
+					<tr>
+						<td><?php esc_html_e( 'Network configuration mode', 'cz-cookie-consent' ); ?></td>
+						<td>
+							<code><?php echo esc_html( CZCC_Settings::network_mode() ); ?></code>
+							<?php if ( 'defaults' === CZCC_Settings::network_mode() ) : ?>
+								— <?php echo esc_html( CZCC_Settings::site_has_override() ? __( 'this site uses its own configuration', 'cz-cookie-consent' ) : __( 'this site inherits the network defaults', 'cz-cookie-consent' ) ); ?>
+							<?php endif; ?>
+						</td>
+					</tr>
+				<?php endif; ?>
 				<tr><td><?php esc_html_e( 'CookieConsent library', 'cz-cookie-consent' ); ?></td><td><?php echo esc_html( CZCC_COOKIECONSENT_VERSION ); ?></td></tr>
 				<tr><td><?php esc_html_e( 'iframemanager library', 'cz-cookie-consent' ); ?></td><td><?php echo esc_html( CZCC_IFRAMEMANAGER_VERSION ); ?></td></tr>
 				<tr>
@@ -593,6 +685,100 @@ class CZCC_Admin {
 		<textarea rows="14" class="large-text code" readonly><?php echo esc_textarea( (string) wp_json_encode( CZCC_Frontend::frontend_config(), JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ) ); ?></textarea>
 		<p class="description"><?php echo esc_html( $settings['debug'] ? __( 'Debug mode is ON: the frontend logs consent events to the browser console.', 'cz-cookie-consent' ) : __( 'Debug mode is OFF.', 'cz-cookie-consent' ) ); ?></p>
 		<?php
+	}
+
+	/**
+	 * Network admin: network-wide configuration page.
+	 */
+	public static function render_network_settings_page() {
+		if ( ! current_user_can( 'manage_network_options' ) ) {
+			return;
+		}
+
+		$tabs = array(
+			'general'  => __( 'General', 'cz-cookie-consent' ),
+			'services' => __( 'Categories & services', 'cz-cookie-consent' ),
+			'texts'    => __( 'Texts', 'cz-cookie-consent' ),
+			'iframes'  => __( 'Iframe blocking', 'cz-cookie-consent' ),
+		);
+
+		$tab = isset( $_GET['tab'] ) ? sanitize_key( wp_unslash( $_GET['tab'] ) ) : 'general'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		if ( ! isset( $tabs[ $tab ] ) ) {
+			$tab = 'general';
+		}
+
+		echo '<div class="wrap czcc-wrap"><h1>' . esc_html__( 'CZ Cookie Consent – network settings', 'cz-cookie-consent' ) . '</h1>';
+
+		if ( ! empty( $_GET['updated'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			echo '<div class="notice notice-success is-dismissible"><p>' . esc_html__( 'Network settings saved.', 'cz-cookie-consent' ) . '</p></div>';
+		}
+
+		echo '<nav class="nav-tab-wrapper">';
+		foreach ( $tabs as $slug => $label ) {
+			printf(
+				'<a href="%s" class="nav-tab%s">%s</a>',
+				esc_url( add_query_arg( array( 'page' => 'czcc-network-settings', 'tab' => $slug ), network_admin_url( 'settings.php' ) ) ),
+				$tab === $slug ? ' nav-tab-active' : '',
+				esc_html( $label )
+			);
+		}
+		echo '</nav>';
+
+		self::render_network_settings_form( $tab );
+
+		echo '</div>';
+	}
+
+	/**
+	 * Network settings form for one tab.
+	 *
+	 * @param string $tab Tab slug.
+	 */
+	private static function render_network_settings_form( $tab ) {
+		$settings = CZCC_Settings::network_settings();
+		$mode     = CZCC_Settings::network_mode();
+
+		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '">';
+		echo '<input type="hidden" name="action" value="czcc_save_network_settings">';
+		echo '<input type="hidden" name="czcc_tab" value="' . esc_attr( $tab ) . '">';
+		wp_nonce_field( 'czcc_save_network_settings' );
+
+		if ( 'general' === $tab ) {
+			$modes = array(
+				'off'      => __( 'Off — every site configures the plugin independently', 'cz-cookie-consent' ),
+				'defaults' => __( 'Network defaults — sites inherit this configuration until they save their own; a site can reset back to it', 'cz-cookie-consent' ),
+				'enforce'  => __( 'Enforce — this configuration applies everywhere, per-site settings are locked', 'cz-cookie-consent' ),
+			);
+			echo '<h2>' . esc_html__( 'Network mode', 'cz-cookie-consent' ) . '</h2>';
+			echo '<fieldset class="czcc-network-mode">';
+			foreach ( $modes as $value => $label ) {
+				printf(
+					'<label><input type="radio" name="czcc_network_mode" value="%s"%s> %s</label><br>',
+					esc_attr( $value ),
+					checked( $mode, $value, false ),
+					esc_html( $label )
+				);
+			}
+			echo '</fieldset>';
+			echo '<hr>';
+		} else {
+			echo '<input type="hidden" name="czcc_network_mode" value="' . esc_attr( $mode ) . '">';
+		}
+
+		self::render_hidden_state( $settings, $tab );
+
+		if ( 'general' === $tab ) {
+			self::render_general_tab( $settings );
+		} elseif ( 'services' === $tab ) {
+			self::render_services_tab( $settings );
+		} elseif ( 'texts' === $tab ) {
+			self::render_texts_tab( $settings );
+		} elseif ( 'iframes' === $tab ) {
+			self::render_iframes_tab( $settings );
+		}
+
+		submit_button( __( 'Save network settings', 'cz-cookie-consent' ) );
+		echo '</form>';
 	}
 
 	/**

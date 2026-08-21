@@ -83,4 +83,18 @@ Manuální checklist pro ověření pluginu. Testujte v anonymním okně; stav c
 | H2 | XSS pokus v textech banneru | `wp_kses_post` na vstupu; výstup přes CookieConsent (HTML povoleno jen v popiscích) |
 | H3 | SQL injection přes filtry logu | Vše přes `$wpdb->prepare` |
 | H4 | Uninstall bez zaškrtnutí „Delete data" | Data zůstávají |
-| H5 | Uninstall se zaškrtnutím | Options + řádky webu smazány; tabulka dropnuta až když souhlasí všechny weby sítě |
+| H5 | Uninstall se zaškrtnutím | Options + řádky webu smazány; tabulka a síťové options dropnuty až když souhlasí všechny weby sítě |
+
+## I. Síťové nastavení (multisite)
+
+| # | Scénář | Očekávání |
+|---|---|---|
+| I1 | Režim **Off** | Chování jako dřív – weby nezávislé; síťová stránka nastavení existuje, ale neaplikuje se |
+| I2 | Režim **Network defaults**, web bez vlastního uložení | Web (admin i frontend banner) používá síťovou konfiguraci; notice „inherits network defaults" |
+| I3 | I2 + web uloží vlastní nastavení | Vznikne per-site přepis; notice „uses its own configuration"; síťové změny se na webu už neprojevují |
+| I4 | I3 + klik „Reset to network defaults" | Per-site option smazána, web opět dědí; potvrzovací dialog |
+| I5 | Režim **Enforce** | Per-site stránka ukazuje jen taby Consent log + Tools s notice; frontend používá síťovou konfiguraci i na webech s dřívějším přepisem |
+| I6 | Enforce + přímý POST na czcc_save_settings | Odmítnuto (wp_die), i s platným nonce |
+| I7 | Uložení síťové stránky | Jen `manage_network_options` + nonce; redirect zpět na správný tab |
+| I8 | Změna režimu na General tabu síťové stránky | Uloží se spolu s nastavením; ostatní taby režim zachovávají (hidden input) |
+| I9 | Single-site instalace | `network_mode()` vždy `off`, žádná síťová stránka, nulový dopad |

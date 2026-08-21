@@ -16,7 +16,9 @@ defined( 'ABSPATH' ) || exit;
  */
 class CZCC_Settings {
 
-	const OPTION = 'czcc_settings';
+	const OPTION              = 'czcc_settings';
+	const NETWORK_OPTION      = 'czcc_network_settings';
+	const NETWORK_MODE_OPTION = 'czcc_network_mode';
 
 	/**
 	 * Cached settings for the current site.
@@ -82,7 +84,14 @@ class CZCC_Settings {
 	}
 
 	/**
-	 * Returns merged settings for the current site.
+	 * Returns effective settings for the current site.
+	 *
+	 * Resolution order on multisite (see network_mode()):
+	 *  - 'enforce':  network settings, per-site settings ignored.
+	 *  - 'defaults': network settings until the site saves its own
+	 *                configuration (a saved site option = full override);
+	 *                "Reset to network defaults" deletes the override.
+	 *  - 'off' / single site: per-site settings only.
 	 *
 	 * @return array
 	 */
@@ -91,16 +100,17 @@ class CZCC_Settings {
 			return self::$cache;
 		}
 
-		$defaults = self::defaults();
-		$saved    = get_option( self::OPTION, array() );
-		if ( ! is_array( $saved ) ) {
-			$saved = array();
+		$mode = self::network_mode();
+
+		if ( 'enforce' === $mode || ( 'defaults' === $mode && ! self::site_has_override() ) ) {
+			$settings = self::network_settings();
+		} else {
+			$saved = get_option( self::OPTION, array() );
+			if ( ! is_array( $saved ) ) {
+				$saved = array();
+			}
+			$settings = self::merge_over_defaults( $saved );
 		}
-
-		$settings = array_merge( $defaults, $saved );
-
-		// Merge texts per language so new text keys get their defaults.
-		$settings['texts'] = self::merge_texts( $defaults['texts'], isset( $saved['texts'] ) && is_array( $saved['texts'] ) ? $saved['texts'] : array() );
 
 		/**
 		 * Filters the effective plugin settings.
@@ -110,6 +120,88 @@ class CZCC_Settings {
 		self::$cache = (array) apply_filters( 'czcc_settings', $settings );
 
 		return self::$cache;
+	}
+
+	/**
+	 * Merges a saved settings array over the shipped defaults.
+	 *
+	 * @param array $saved Saved (partial) settings.
+	 * @return array
+	 */
+	private static function merge_over_defaults( array $saved ) {
+		$defaults = self::defaults();
+		$settings = array_merge( $defaults, $saved );
+
+		// Merge texts per language so new text keys get their defaults.
+		$settings['texts'] = self::merge_texts( $defaults['texts'], isset( $saved['texts'] ) && is_array( $saved['texts'] ) ? $saved['texts'] : array() );
+
+		return $settings;
+	}
+
+	/**
+	 * Network configuration mode.
+	 *
+	 * @return string 'off' | 'defaults' | 'enforce' (always 'off' on single site).
+	 */
+	public static function network_mode() {
+		if ( ! is_multisite() ) {
+			return 'off';
+		}
+		$mode = get_site_option( self::NETWORK_MODE_OPTION, 'off' );
+		return in_array( $mode, array( 'off', 'defaults', 'enforce' ), true ) ? $mode : 'off';
+	}
+
+	/**
+	 * Network-level settings merged over defaults.
+	 *
+	 * @return array
+	 */
+	public static function network_settings() {
+		$saved = get_site_option( self::NETWORK_OPTION, array() );
+		if ( ! is_array( $saved ) ) {
+			$saved = array();
+		}
+		return self::merge_over_defaults( $saved );
+	}
+
+	/**
+	 * Whether the current site has saved its own configuration.
+	 *
+	 * @return bool
+	 */
+	public static function site_has_override() {
+		return is_array( get_option( self::OPTION, false ) );
+	}
+
+	/**
+	 * Persists network settings.
+	 *
+	 * @param array $settings Sanitized settings.
+	 */
+	public static function update_network( array $settings ) {
+		update_site_option( self::NETWORK_OPTION, $settings );
+		self::$cache = null;
+	}
+
+	/**
+	 * Persists the network mode.
+	 *
+	 * @param string $mode 'off' | 'defaults' | 'enforce'.
+	 */
+	public static function update_network_mode( $mode ) {
+		if ( in_array( $mode, array( 'off', 'defaults', 'enforce' ), true ) ) {
+			update_site_option( self::NETWORK_MODE_OPTION, $mode );
+			self::$cache = null;
+		}
+	}
+
+	/**
+	 * Deletes the per-site configuration (site falls back to network
+	 * defaults, or to shipped defaults outside 'defaults' mode).
+	 */
+	public static function delete_site_settings() {
+		delete_option( self::OPTION );
+		self::$cache = null;
 	}
 
 	/**
@@ -170,12 +262,16 @@ class CZCC_Settings {
 	/**
 	 * Sanitizes a settings array coming from the admin form.
 	 *
-	 * @param array $input Raw input.
+	 * @param array      $input Raw (already unslashed) input.
+	 * @param array|null $base  Settings the input is applied over; defaults
+	 *                          to the current site's effective settings.
+	 *                          Pass CZCC_Settings::network_settings() when
+	 *                          saving the network-level configuration.
 	 * @return array Sanitized settings.
 	 */
-	public static function sanitize( array $input ) {
+	public static function sanitize( array $input, $base = null ) {
 		$defaults = self::defaults();
-		$current  = self::get();
+		$current  = is_array( $base ) ? $base : self::get();
 		$clean    = $current;
 
 		$clean['consent_duration_days'] = isset( $input['consent_duration_days'] ) ? max( 1, min( 730, (int) $input['consent_duration_days'] ) ) : $defaults['consent_duration_days'];
