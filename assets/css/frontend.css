@@ -6,7 +6,7 @@
  * specific to this plugin live here.
  */
 
-/* Preferences link rendered by the [czcc_preferences] shortcode. */
+/* Preferences link rendered by [czcc_preferences] (default look). */
 .czcc-preferences-link {
 	background: none;
 	border: none;
@@ -16,6 +16,30 @@
 	color: inherit;
 	text-decoration: underline;
 	cursor: pointer;
+}
+
+/* Button look rendered by [czcc_preferences style="button"]. Kept neutral
+   (inherits the surrounding font/color) so it blends with any theme; pass
+   your theme's button class via the shortcode's class attribute for a
+   pixel-perfect match. */
+.czcc-preferences-button {
+	display: inline-block;
+	padding: 0.5em 1.1em;
+	margin: 0;
+	border: 1px solid currentColor;
+	border-radius: 4px;
+	background: transparent;
+	font: inherit;
+	color: inherit;
+	line-height: 1.4;
+	text-decoration: none;
+	cursor: pointer;
+	transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.czcc-preferences-button:hover,
+.czcc-preferences-button:focus {
+	background: rgba(0, 0, 0, 0.07);
 }
 
 /* Sensible default sizing for auto-wrapped iframe placeholders. */

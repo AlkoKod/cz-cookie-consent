@@ -122,6 +122,23 @@ Detailní návod na GTM triggery/proměnné: **[docs/gtm-setup.md](docs/gtm-setu
 - Náhledy videí se ve výchozím stavu **nenačítají** (únik IP na servery třetí strany před souhlasem); lze zapnout.
 - Odblokování po souhlasu proběhne **bez reloadu** (service `onAccept` → `im.acceptService()`).
 
+## Shortcode – úprava souhlasu
+
+Návštěvník musí mít možnost souhlas kdykoli změnit (typicky odkaz v patičce):
+
+```
+[czcc_preferences]                                            → podtržený textový odkaz
+[czcc_preferences style="button"]                             → neutrální tlačítko
+[czcc_preferences style="button" text="Nastavení cookies"]    → vlastní text
+[czcc_preferences style="button" class="wp-block-button__link"] → převezme třídu tématu
+```
+
+- `text` – popisek (výchozí = titulek preferences modalu v aktuálním jazyce)
+- `style` – `link` (výchozí) nebo `button`
+- `class` – extra CSS třídy (např. třída tlačítka vašeho tématu/builderu)
+
+Alternativa bez shortcode (menu, šablony, buildery): jakýkoli element s atributem `data-cc="show-preferencesModal"` otevře nastavení, např. `<a href="#" data-cc="show-preferencesModal">Cookies</a>`.
+
 ## REST API
 
 `POST /wp-json/czcc/v1/consent` – veřejný endpoint (souhlasy anonymních návštěvníků + cachované stránky ⇒ nelze stavět na nonce), chráněný:

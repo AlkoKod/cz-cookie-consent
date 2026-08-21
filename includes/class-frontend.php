@@ -499,7 +499,17 @@ JS;
 	}
 
 	/**
-	 * [czcc_preferences] shortcode: link that opens the preferences modal.
+	 * [czcc_preferences] shortcode: element that opens the preferences modal.
+	 *
+	 * Attributes:
+	 *  - text:  label (default: preferences modal title for the current language)
+	 *  - style: 'link' (default, underlined text) or 'button' (styled button)
+	 *  - class: extra CSS classes, e.g. your theme's button class
+	 *
+	 * Examples:
+	 *  [czcc_preferences]
+	 *  [czcc_preferences style="button"]
+	 *  [czcc_preferences style="button" text="Změnit nastavení cookies" class="wp-block-button__link"]
 	 *
 	 * @param array $atts Shortcode attributes.
 	 * @return string
@@ -510,14 +520,25 @@ JS;
 
 		$atts = shortcode_atts(
 			array(
-				'text' => isset( $texts['preferences_title'] ) ? $texts['preferences_title'] : 'Cookie settings',
+				'text'  => isset( $texts['preferences_title'] ) ? $texts['preferences_title'] : 'Cookie settings',
+				'style' => 'link',
+				'class' => '',
 			),
 			$atts,
 			'czcc_preferences'
 		);
 
+		$classes = array( 'button' === $atts['style'] ? 'czcc-preferences-button' : 'czcc-preferences-link' );
+		foreach ( preg_split( '/\s+/', (string) $atts['class'], -1, PREG_SPLIT_NO_EMPTY ) as $class ) {
+			$class = sanitize_html_class( $class );
+			if ( '' !== $class ) {
+				$classes[] = $class;
+			}
+		}
+
 		return sprintf(
-			'<button type="button" class="czcc-preferences-link" data-cc="show-preferencesModal">%s</button>',
+			'<button type="button" class="%s" data-cc="show-preferencesModal">%s</button>',
+			esc_attr( implode( ' ', $classes ) ),
 			esc_html( $atts['text'] )
 		);
 	}

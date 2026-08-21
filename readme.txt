@@ -4,7 +4,7 @@ Tags: cookie consent, gdpr, google consent mode, gtm, multisite
 Requires at least: 6.0
 Tested up to: 6.8
 Requires PHP: 7.4
-Stable tag: 1.1.0
+Stable tag: 1.2.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -24,6 +24,7 @@ CZ Cookie Consent is a cookie consent plugin built on the Orestbida CookieConsen
 * Multilingual texts editable in admin (Czech + English shipped, more languages can be added; WPML/Polylang compatible via locale).
 * Consent log admin with filtering, CSV export and purging; network-wide log on multisite.
 * REST endpoint with strict validation and rate limiting.
+* [czcc_preferences] shortcode (link or button style) to reopen the consent preferences at any time; any element with data-cc="show-preferencesModal" works too.
 
 Legal note: this plugin is a technical tool and does not by itself guarantee GDPR/ePrivacy compliance. Have the final texts and configuration reviewed by a lawyer.
 
@@ -44,6 +45,9 @@ Yes. The plugin manages Consent Mode and the dataLayer regardless of how GTM is 
 In a custom global table (base_prefix + czcc_consents) with a blog_id column. IP addresses and user agents are stored only as salted SHA-256 hashes.
 
 == Changelog ==
+
+= 1.2.0 =
+* The [czcc_preferences] shortcode now supports style="button" (neutral themable button look), a class attribute for theme button classes and a customizable text attribute.
 
 = 1.1.0 =
 * Network-wide configuration on multisite: new Network Admin -> Settings -> Cookie Consent page.
