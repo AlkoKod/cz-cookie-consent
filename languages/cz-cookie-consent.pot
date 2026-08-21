@@ -1,0 +1,21 @@
+# Copyright (C) 2026 Innovative Business s.r.o.
+# This file is distributed under the GPL v2 or later.
+msgid ""
+msgstr ""
+"Project-Id-Version: CZ Cookie Consent 1.0.0\n"
+"Report-Msgid-Bugs-To: https://github.com/AlkoKod/cz-cookie-consent/issues\n"
+"POT-Creation-Date: 2026-08-21T00:00:00+00:00\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"X-Generator: WP-CLI 2.11\n"
+"X-Domain: cz-cookie-consent\n"
+
+# Regenerate this template with:
+#   wp i18n make-pot . languages/cz-cookie-consent.pot
+# Admin UI strings use the 'cz-cookie-consent' text domain. Frontend banner
+# texts are stored in plugin settings (editable per language in admin) and
+# are intentionally NOT part of this gettext template.

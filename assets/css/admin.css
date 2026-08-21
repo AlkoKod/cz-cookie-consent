@@ -1,0 +1,61 @@
+/**
+ * CZ Cookie Consent – admin styles.
+ */
+
+.czcc-wrap .czcc-inline {
+	margin-right: 16px;
+}
+
+.czcc-services-table code {
+	font-size: 11px;
+}
+
+.czcc-badge {
+	display: inline-block;
+	padding: 1px 6px;
+	border-radius: 3px;
+	background: #e5f5fa;
+	color: #045;
+	font-size: 11px;
+	margin-right: 4px;
+}
+
+.czcc-badge-req {
+	background: #fef3e0;
+	color: #843;
+}
+
+.czcc-gcm {
+	display: inline-block;
+	padding: 0 4px;
+	border-radius: 3px;
+	font-size: 10px;
+	text-transform: uppercase;
+}
+
+.czcc-gcm-granted {
+	background: #d9f2d9;
+	color: #163;
+}
+
+.czcc-gcm-denied {
+	background: #f6dede;
+	color: #711;
+}
+
+.czcc-lang-heading {
+	border-bottom: 1px solid #ccd0d4;
+	padding-bottom: 4px;
+	margin-top: 32px;
+}
+
+.czcc-remove-lang {
+	font-size: 12px;
+	font-weight: normal;
+	margin-left: 12px;
+	color: #a00;
+}
+
+.czcc-status-table {
+	max-width: 800px;
+}

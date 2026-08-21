@@ -1,0 +1,14 @@
+# OS / editor noise
+.DS_Store
+Thumbs.db
+desktop.ini
+*.swp
+.idea/
+.vscode/
+
+# Build / dependency artifacts (none are committed on purpose;
+# vendor banner libraries under assets/vendor ARE committed)
+node_modules/
+composer.lock
+/vendor/
+*.zip
