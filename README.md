@@ -1,4 +1,4 @@
-# CZ Cookie Consent
+# punkCookies
 
 WordPress plugin pro cookie lištu s **Google Consent Mode v2**, logováním souhlasů do vlastní DB tabulky, podporou **multisite** a kompatibilitou s **GTM4WP** (1.x i 2.x). Veškeré měřicí/reklamní skripty se spouštějí přes **Google Tag Manager** – plugin je nevkládá, pouze řídí consent stav a dataLayer.
 
@@ -203,3 +203,14 @@ Viz [docs/testing.md](docs/testing.md) – pokrývá první návštěvu, přijmo
 ## Licence
 
 Plugin: GPL v2 or later. Bundlované knihovny CookieConsent a iframemanager: MIT (© Orest Bida).
+
+
+## OpenAI Ads / PunkAds
+
+V předvyplněných službách je **OpenAI Ads** (`openai-ads`), kategorie `marketing`. Ve výchozím stavu je služba vypnutá; zapněte ji v **Categories & services** jen na webech, které tuto integraci používají. Přidání služby samo neinstaluje pixel ani neodesílá konverze.
+
+V PunkAds vyberte **CZ Cookie Consent / Orest Bida CookieConsent v3**, nastavte **Marketing category key** na `marketing` a **Service key** na `openai-ads`. Pokud kategorii přesunete, musí se shodovat i v PunkAds. Pro řízení podle lišty musí být v PunkAds vypnuté **Start without waiting for consent**. Nevkládejte další OpenAI loader přes lištu nebo GTM, pokud jej již načítá PunkAds.
+
+Po přidání služby zvyšte revizi souhlasu, uložte nastavení a vyprázdněte page cache. Ověřte přijetí i odvolání služby. Preset obsahuje reference `__oppref` a `__obref` používané integrací; neobsahuje HttpOnly cookie PunkAds `akam_consent_ref`, kterou musí spravovat serverová synchronizace PunkAds, nikoli mazání JavaScriptem. Google Consent Mode není náhradou souhlasu pro OpenAI.
+
+Dokumentace pixelu: https://developers.openai.com/ads/measurement-pixel

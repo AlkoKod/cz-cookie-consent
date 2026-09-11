@@ -33,8 +33,8 @@ class CZCC_Admin {
 	 */
 	public static function register_menu() {
 		add_options_page(
-			__( 'Cookie Consent', 'cz-cookie-consent' ),
-			__( 'Cookie Consent', 'cz-cookie-consent' ),
+			__( 'punkCookies', 'cz-cookie-consent' ),
+			__( 'punkCookies', 'cz-cookie-consent' ),
 			'manage_options',
 			'czcc-settings',
 			array( __CLASS__, 'render_page' )
@@ -47,16 +47,16 @@ class CZCC_Admin {
 	public static function register_network_menu() {
 		add_submenu_page(
 			'settings.php',
-			__( 'Cookie Consent', 'cz-cookie-consent' ),
-			__( 'Cookie Consent', 'cz-cookie-consent' ),
+			__( 'punkCookies', 'cz-cookie-consent' ),
+			__( 'punkCookies', 'cz-cookie-consent' ),
 			'manage_network_options',
 			'czcc-network-settings',
 			array( __CLASS__, 'render_network_settings_page' )
 		);
 		add_submenu_page(
 			'settings.php',
-			__( 'Cookie Consent Log', 'cz-cookie-consent' ),
-			__( 'Cookie Consent Log', 'cz-cookie-consent' ),
+			__( 'punkCookies Log', 'cz-cookie-consent' ),
+			__( 'punkCookies Log', 'cz-cookie-consent' ),
 			'manage_network_options',
 			'czcc-network-log',
 			array( __CLASS__, 'render_network_log' )
@@ -206,7 +206,7 @@ class CZCC_Admin {
 			<div class="czcc-header-title">
 				<span class="czcc-logo" aria-hidden="true">🍪</span>
 				<h1>
-					<?php esc_html_e( 'CZ Cookie Consent', 'cz-cookie-consent' ); ?>
+					<?php esc_html_e( 'punkCookies', 'cz-cookie-consent' ); ?>
 					<?php if ( $subtitle ) : ?>
 						<span class="czcc-subtitle"><?php echo esc_html( $subtitle ); ?></span>
 					<?php endif; ?>

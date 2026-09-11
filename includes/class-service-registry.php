@@ -193,6 +193,23 @@ class CZCC_Service_Registry {
 				'default_enabled' => false,
 				'required'        => false,
 			),
+			// ---- OpenAI -------------------------------------------------.
+			'openai-ads'               => array(
+				'name'            => 'OpenAI Ads',
+				'provider'        => 'OpenAI',
+				'category'        => 'marketing',
+				'description'     => array(
+					'cs' => 'Měření účinnosti reklam OpenAI Ads, interakcí na webu a nákupních konverzí pomocí pixelu a Conversions API. Podle nastavení integrace mohou být pro přiřazení konverzí předávány také hashované kontaktní údaje.',
+					'en' => 'Measures OpenAI Ads performance, website interactions and purchase conversions through the pixel and Conversions API. Depending on integration settings, hashed contact details may also be sent for conversion matching.',
+				),
+				'cookies'         => array( '__oppref', '__obref' ),
+				'domains'         => array( 'bzrcdn.openai.com', 'bzr.openai.com' ),
+				// OpenAI consent is handled by its integration, not Google Consent Mode.
+				'gcm'             => array(),
+				'iframe'          => false,
+				'default_enabled' => false,
+				'required'        => false,
+			),
 			// ---- Meta ---------------------------------------------------.
 			'facebook-pixel'           => array(
 				'name'            => 'Facebook Pixel',

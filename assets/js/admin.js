@@ -1,5 +1,5 @@
 /**
- * CZ Cookie Consent – admin helpers.
+ * punkCookies – admin helpers.
  */
 (function () {
 	'use strict';
