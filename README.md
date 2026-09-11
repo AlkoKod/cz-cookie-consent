@@ -1,5 +1,7 @@
 # PunkCookies – Cookies Consent Manager
 
+Author: **Aleš Sýkora / Punkweb.cz** — https://punkweb.cz/
+
 WordPress plugin pro cookie lištu s **Google Consent Mode v2**, logováním souhlasů do vlastní DB tabulky, podporou **multisite** a kompatibilitou s **GTM4WP** (1.x i 2.x). Veškeré měřicí/reklamní skripty se spouštějí přes **Google Tag Manager** – plugin je nevkládá, pouze řídí consent stav a dataLayer.
 
 > ⚠️ **Právní upozornění:** Plugin je technický nástroj. Nezaručuje sám o sobě soulad s GDPR/ePrivacy – finální texty, kategorie a právní nastavení musí posoudit právník.
