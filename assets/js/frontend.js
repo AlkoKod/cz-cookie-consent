@@ -1,5 +1,5 @@
 /**
- * punkCookies – frontend.
+ * PunkCookies – frontend.
  *
  * Wires Orestbida CookieConsent v3 + iframemanager to Google Consent Mode
  * v2, the dataLayer and the REST consent log. The Consent Mode DEFAULT is

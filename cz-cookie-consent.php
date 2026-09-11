@@ -1,16 +1,16 @@
 <?php
 /**
- * punkCookies
+ * PunkCookies
  *
  * @package           CZ_Cookie_Consent
  * @author            Innovative Business s.r.o.
  * @license           GPL-2.0-or-later
  *
  * @wordpress-plugin
- * Plugin Name:       punkCookies
+ * Plugin Name:       PunkCookies – Cookies Consent Manager
  * Plugin URI:        https://github.com/AlkoKod/cz-cookie-consent
  * Description:       Cookie consent banner s Google Consent Mode v2, logováním souhlasů, podporou multisite a kompatibilitou s GTM4WP. Postaveno na knihovnách Orestbida CookieConsent v3 a iframemanager.
- * Version:           1.4.1
+ * Version:           1.4.2
  * Requires at least: 6.0
  * Requires PHP:      7.4
  * Author:            Innovative Business s.r.o.
@@ -22,7 +22,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'CZCC_VERSION', '1.4.1' );
+define( 'CZCC_VERSION', '1.4.2' );
 define( 'CZCC_DB_VERSION', '1' );
 define( 'CZCC_PLUGIN_FILE', __FILE__ );
 define( 'CZCC_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );

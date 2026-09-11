@@ -159,7 +159,7 @@ class CZCC_Frontend {
 })(%s);
 JS;
 
-		echo "\n<!-- punkCookies: Google Consent Mode v2 default -->\n";
+		echo "\n<!-- PunkCookies: Google Consent Mode v2 default -->\n";
 		echo '<script id="czcc-consent-default">' . sprintf( $script, $json ) . "</script>\n"; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- JSON built via wp_json_encode, script is static.
 	}
 

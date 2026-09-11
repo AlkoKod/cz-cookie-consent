@@ -1,10 +1,10 @@
-=== punkCookies ===
+=== PunkCookies – Cookies Consent Manager ===
 Contributors: innovativebusiness
 Tags: cookie consent, gdpr, google consent mode, gtm, multisite
 Requires at least: 6.0
 Tested up to: 6.8
 Requires PHP: 7.4
-Stable tag: 1.4.1
+Stable tag: 1.4.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -12,7 +12,7 @@ Cookie consent banner with Google Consent Mode v2, consent logging, multisite su
 
 == Description ==
 
-punkCookies is a cookie consent plugin built on the Orestbida CookieConsent v3 and iframemanager libraries.
+PunkCookies is a cookie consent plugin built on the Orestbida CookieConsent v3 and iframemanager libraries.
 
 * Google Consent Mode v2: default state printed at wp_head priority 0, before any GTM output; stored consent re-applied synchronously for returning visitors.
 * GTM4WP compatible (1.x and 2.x) - the plugin suppresses/aligns GTM4WP's own consent default block.
@@ -46,8 +46,11 @@ In a custom global table (base_prefix + czcc_consents) with a blog_id column. IP
 
 == Changelog ==
 
+= 1.4.2 =
+* Use the full product name PunkCookies – Cookies Consent Manager.
+
 = 1.4.1 =
-* Rename the display name to punkCookies; preserve existing plugin identifiers and settings.
+* Rename the display name to PunkCookies; preserve existing plugin identifiers and settings.
 * Add an optional OpenAI Ads marketing service preset with Czech and English descriptions and PunkAds integration instructions.
 
 = 1.4.0 =

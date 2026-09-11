@@ -1,5 +1,5 @@
 /**
- * punkCookies – admin helpers.
+ * PunkCookies – admin helpers.
  */
 (function () {
 	'use strict';
